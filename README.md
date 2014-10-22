@@ -49,7 +49,7 @@ to the interpreter you want to use.
 Several global variables are involved in the configuration of the plugin; you should
 set them in your ~/.vimrc configuration file.
 
-## Shortcuts
+### Shortcuts
 
 You should probably map the `NotebookEvaluate()` function to some convenient key.
 For instance:
@@ -58,7 +58,7 @@ For instance:
 
 will map the µ key to the function evaluating code blocks.
 
-## Various settings
+### Various settings
 
 The code block being evaluated can be highlighted until the output has been printed:
 
@@ -75,7 +75,7 @@ Not all interpreters will work with the plugin, but it is intended to allow many
 ways of hacking and you should be able to use many different programs anyway.
 Have a look at different settings in order to understand them.
 
-## Configuring the sh kernel
+### Configuring the sh kernel
 
 This is the default setting:
 
@@ -93,7 +93,7 @@ interpreter from the previous command.
 The last line is a hack; here no setting is provided; some more complicated
 interpreters may need it (see below).
 
-## Configuring the bc calculator
+### Configuring the bc calculator
 
     let g:notebook_cmd='bc 2>&1'
     let g:notebook_stop='quit'
@@ -104,7 +104,7 @@ interpreters may need it (see below).
 The settings are similar to the previous ones; but here we added `2>&1` to the
 command in order to catch error messages as well.
 
-## Configuring Maxima
+### Configuring Maxima
 
 The plugin was written with Maxima in mind. Here are some working settings:
 
@@ -118,6 +118,12 @@ The plugin was written with Maxima in mind. Here are some working settings:
 The command is prefixed with `stdbuf -i0 -o0 -e0` in order to unbuffer the following
 command because intercommunication between processes is highly sensitive and the
 whole system could be stuck otherwise.
+
+The last line contains an espace character in the string; this is because Maxima
+seems to add an espace when printing the string. If you encounter some issues with
+these settings, you should carefully study wether your version of Maxima behaves
+like that or not (you can do it by launching Maxima in a `script` session and then
+study the resulting _typescript_ file).
 
 Furthermore, the `g:notebook_send0` setting _may_ be used here. It will send
 some more characters after each command and before askinf for the internal key.
@@ -140,7 +146,7 @@ Another strategy can be something like that:
 Now the user has to use the `;` (or `$`) syntax; a strange error will be printed
 when forgotten but the communication between processes will remain alive also.
 
-## Configuring GNU APL
+### Configuring GNU APL
 
 GNU APL works very well with the following settings:
 
