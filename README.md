@@ -160,6 +160,16 @@ GNU APL works very well with the following settings:
     let g:notebook_send = "'VIMGNUAPLNOTEBOOK'"
     let g:notebook_detect = 'VIMGNUAPLNOTEBOOK'
 
+### Configuring the J interpreter
+
+The three-spaces prompt may be an issue. A quick fix can be:
+
+    let g:notebook_cmd = '~/j/j801/bin/jconsole'
+    let g:notebook_stop = "exit ''"
+    let g:notebook_send0="''"
+    let g:notebook_send = "'VIMJNOTEBOOK'"
+    let g:notebook_detect = '   VIMJNOTEBOOK'
+
 # Using the Notebook plugin
 
 Just start it with:
