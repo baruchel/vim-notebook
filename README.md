@@ -20,6 +20,9 @@ Thus, Vim will behave like several well-known "notebook" software:
 It has been tested with several interpreters and seems to work well with _Maxima_,
 _GNU APL_, etc. as well as with some standard tools like `bc` or `sh`.
 
+A demo can be seen [there](https://www.youtube.com/watch?v=wCGydHdE4b8).
+[![Demo](http://img.youtube.com/vi/wCGydHdE4b8/0.jpg)](https://www.youtube.com/watch?v=wCGydHdE4b8)
+
 The plugin uses Unix background processes, special files, etc. and will only work
 on Unix-like operating systems.
 
