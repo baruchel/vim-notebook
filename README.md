@@ -170,6 +170,8 @@ The three-spaces prompt may be an issue. A quick fix can be:
     let g:notebook_send = "'VIMJNOTEBOOK'"
     let g:notebook_detect = '   VIMJNOTEBOOK'
 
+You have to be careful when copying lines 3 (no-op like) and 5 (with three spaces).
+
 # Using the Notebook plugin
 
 Just start it with:
