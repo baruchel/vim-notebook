@@ -1,8 +1,8 @@
 " Vim plugin for communicating with some interpreter from a notebook like document
 "
 " Maintainer:	Thomas Baruchel <baruchel@gmx.com>
-" Last Change:	2014 Oct 21
-" Version:      1.0
+" Last Change:	2014 Oct 23
+" Version:      1.0.1
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -26,7 +26,7 @@
 
 
 if !exists('g:notebook_cmd')
-  let g:notebook_cmd = '/bin/sh'
+  let g:notebook_cmd = '/bin/sh 2>&1'
 endif
 if !exists('g:notebook_stop')
   let g:notebook_stop = 'exit'
@@ -97,12 +97,16 @@ endfunction
 
 function! NotebookEvaluate()
 
-  let l:save_cursor = getpos(".")
-  let l:currentline = line(".")
+  if !exists('b:notebook_pid')
+    return
+  endif
 
+  let l:currentline = line(".")
   if synIDattr(synID(l:currentline,1,1),"name") != "markdownCodeBlock"
     return
   endif
+
+  let l:save_cursor = getpos(".")
 
   let l:blockstart = l:currentline
   while (synIDattr(synID(l:blockstart,1,1),"name") == "markdownCodeBlock")
@@ -118,13 +122,6 @@ function! NotebookEvaluate()
     let l:blockend = l:blockend + 1
   endwhile
   let l:blockend = l:blockend - 1
-
-  if l:blockstart == l:blockend
-    echon "Sending line ".l:blockstart." to the kernel (1 line)..."
-  else
-    echon "Sending lines ".l:blockstart."-".l:blockend
-      \ . " to the kernel (".(l:blockend-l:blockstart+1)." lines)..."
-  endif
 
   if g:notebook_highlight != 0
     let l:tmp_pattern = "match Todo /"
@@ -149,13 +146,18 @@ function! NotebookEvaluate()
   if g:notebook_highlight != 0
     match
   endif
-  echo " "
-  redraw
 
   if g:notebook_resetpos != 0
     call setpos('.', l:save_cursor)
   endif
   redraw
+
+  if l:blockstart == l:blockend
+    echo "Line ".l:blockstart." was sent to the kernel (1 line)"
+  else
+    echo "Lines ".l:blockstart."-".l:blockend
+      \ . " were sent to the kernel (".(l:blockend-l:blockstart+1)." lines)"
+  endif
 endfunction
 
 
@@ -197,6 +199,7 @@ function! NotebookStart()
   let l:tmp = system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
 
   set filetype=markdown
+  syntax on
 
   let l:tmp = system('cat ' . l:out . ' > /dev/null')
   echo ' '

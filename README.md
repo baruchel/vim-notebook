@@ -12,7 +12,7 @@ state between calls.
 
 Thus, Vim will behave like several well-known "notebook" software:
 
-  * iPython
+  * iPython Notebook
   * Maple
   * Mathematica
   * etc.
@@ -28,8 +28,8 @@ The plugin uses Unix background processes, special files, etc. and will only wor
 on Unix-like operating systems.
 
 When the kernel is launched, the filetype of the document will be set to "markdown"
-and the standard syntax file for the Markdown" type will be used (it is up to the
-user to enable highlighting or not). This syntax file defines a "markdownCodeBlock"
+and the standard syntax file for the Markdown type will be used; syntax highlighting
+will also be enabled. This standard syntax file defines a "markdownCodeBlock"
 element made with lines of code beginning with 4 spaces:
 
     this is an example of "markdownCodeBlock"
@@ -83,13 +83,14 @@ Have a look at different settings in order to understand them.
 
 This is the default setting:
 
-    let g:notebook_cmd = '/bin/sh'
+    let g:notebook_cmd = '/bin/sh 2>&1'
     let g:notebook_stop = 'exit'
     let g:notebook_send = 'echo NOTEBOOK-VIM-INTERNAL-KEY'
     let g:notebook_detect = 'NOTEBOOK-VIM-INTERNAL-KEY'
     let g:notebook_send0 = ''
 
-The first line is the command to be used for starting the interpreter.
+The first line is the command to be used for starting the interpreter. In order
+to catch error messages as well we added `2>&1` to the command.
 The second line is the command to be sent to the interpreter for leaving.
 The third line is a command for the interpreter making it print some arbitrary
 and complicated string. The fourth line is the _exact_ string printed by the
@@ -105,8 +106,7 @@ interpreters may need it (see below).
     let g:notebook_detect="VIMBCNOTEBOOK"
     let g:notebook_send0=""
 
-The settings are similar to the previous ones; but here we added `2>&1` to the
-command in order to catch error messages as well.
+The settings are similar to the previous ones.
 
 ### Configuring Maxima
 
