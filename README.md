@@ -118,6 +118,16 @@ interpreters may need it (see below).
 
 The settings are similar to the previous ones.
 
+#### Configuring the dc calculator
+
+    let g:notebook_cmd='dc 2>&1'
+    let g:notebook_stop='q'
+    let g:notebook_send='[][VIMDCNOTEBOOK]npn'
+    let g:notebook_detect='VIMDCNOTEBOOK'
+    let g:notebook_send0=''
+
+The settings are similar to the previous ones.
+
 #### Configuring Octave
 
 Ocatve should work with no problem with following settings:
