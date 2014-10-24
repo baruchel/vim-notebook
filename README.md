@@ -21,8 +21,8 @@ Thus, Vim will behave like several well-known "notebook" software:
   * Mathematica
   * etc.
 
-It has been tested with several interpreters and seems to work well with _Maxima_,
-_GNU APL_, etc. as well as with some standard tools like `bc` or `sh`.
+It has been tested with several interpreters and seems to work well with _Octave_,
+_Maxima_, _GNU APL_, _J_, etc. as well as with some standard tools like `bc` or `sh`.
 
 A demo can be seen [there](https://www.youtube.com/watch?v=wCGydHdE4b8).
 
@@ -38,7 +38,7 @@ element made with lines of code beginning with 4 spaces:
 
     this is an example of "markdownCodeBlock"
 
-When the cursor is on such a line, calling the relevant function will make the whole
+When the cursor is on such a line, using the `NotebookEvaluate` command will make the whole
 block (no matter where the cursor is exactly in the block) be sent to the interpreter
 and the output will be printed below.
 
@@ -85,7 +85,11 @@ Not all interpreters will work with the plugin, but it is intended to allow many
 ways of hacking and you should be able to use many different programs anyway.
 Have a look at different settings in order to understand them.
 
-### Configuring the sh kernel
+The interpreter should not use any buffering when writing to the standard output.
+If it is the case, it should still be possible to use the interpreter with the
+help of the `stdbuf` command (see the example for Maxima below).
+
+#### Configuring the sh kernel
 
 This is the default setting:
 
@@ -104,7 +108,7 @@ interpreter from the previous command.
 The last line is a hack; here no setting is provided; some more complicated
 interpreters may need it (see below).
 
-### Configuring the bc calculator
+#### Configuring the bc calculator
 
     let g:notebook_cmd='bc 2>&1'
     let g:notebook_stop='quit'
@@ -114,9 +118,21 @@ interpreters may need it (see below).
 
 The settings are similar to the previous ones.
 
-### Configuring Maxima
+#### Configuring Octave
 
-The plugin was written with Maxima in mind. Here are some working settings:
+Ocatve should work with no problem with following settings:
+
+    let g:notebook_cmd='octave'
+    let g:notebook_stop='exit'
+    let g:notebook_send='printf \"VIMOCTAVENOTEBOOK\n\"'
+    let g:notebook_detect='VIMOCTAVENOTEBOOK'
+    let g:notebook_send0=""
+
+#### Configuring Maxima
+
+The plugin was written with Maxima in mind and it should work quite well with it.
+But since Maxima can be compiled in many different ways, the following settings may
+have to be adjusted. Here are some working settings:
 
     let g:notebook_cmd='stdbuf -i0 -o0 -e0 /usr/bin/maxima'
        \ . ' --disable-readline --very-quiet'
@@ -136,10 +152,10 @@ like that or not (you can do it by launching Maxima in a `script` session and th
 study the resulting _typescript_ file).
 
 Furthermore, the `g:notebook_send0` setting _may_ be used here. It will send
-some more characters after each command and before askinf for the internal key.
+some more characters after each command and before asking for the internal key.
 If this setting is not used, the user should _never_ forget the final `;` in
 the code being evaluated. If the `;` (or `$` character) is forgotten, the whole
-session will be lost and the kernel will have to be restarted.
+session will be lost and the kernel will have to be killed and restarted.
 
 Several hacks can be used; the user can choose to never use the `;` but to add it
 in the `g:notebook_send0` variable:
@@ -156,7 +172,18 @@ Another strategy can be something like that:
 Now the user has to use the `;` (or `$`) syntax; a strange error will be printed
 when forgotten but the communication between processes will remain alive also.
 
-### Configuring GNU APL
+#### Configuring Pari-GP
+
+The plugin should work well with Pari-GP; however it has been tested with an old
+out-of-date version of Pari-GP; the settings should be something like:
+
+    let g:notebook_cmd='gp -q'
+    let g:notebook_stop='quit()'
+    let g:notebook_send='print(\"VIMPARIGPNOTEBOOK\");'
+    let g:notebook_detect='VIMPARIGPNOTEBOOK'
+    let g:notebook_send0='default(\"readline\",0); default(\"colors\",0);'
+
+#### Configuring GNU APL
 
 GNU APL works very well with the following settings:
 
@@ -166,7 +193,7 @@ GNU APL works very well with the following settings:
     let g:notebook_send = "'VIMGNUAPLNOTEBOOK'"
     let g:notebook_detect = 'VIMGNUAPLNOTEBOOK'
 
-### Configuring the J interpreter
+#### Configuring the J interpreter
 
 The three-spaces prompt may be an issue. A quick fix can be:
 
