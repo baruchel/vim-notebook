@@ -180,6 +180,14 @@ Just start it with:
 
 (or add some shortcut in your configuration file).
 
+Then, a block of code may be evaluated with:
+
+    :call NotebookEvaluate()
+
+The whole notebook document may be evaluated with:
+
+    :call NotebookEvaluateAll()
+
 If you encounter some issues, just type `:!ps` and if you see your interpreter still
 running though not answering, you may want to kill all involved processes with:
 

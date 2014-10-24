@@ -2,7 +2,7 @@
 "
 " Maintainer:	Thomas Baruchel <baruchel@gmx.com>
 " Last Change:	2014 Oct 23
-" Version:      1.0.1
+" Version:      1.0.2
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -48,16 +48,17 @@ if !exists('g:notebook_resetpos')
 endif
 
 
-
 if exists('loaded_notebook') || &cp
     finish
 endif
 let loaded_notebook=1
 
 
+" Close the current kernel
 function! NotebookClose()
 
   if !exists('b:notebook_pid')
+    echo "No kernel is currently running."
     return
   endif
 
@@ -95,18 +96,24 @@ function! NotebookClose()
 endfunction
 
 
+" Evaluate the Code Block at the position of the cursor.
+" Since version 1.0.2 the function NotebookEvaluate() has a return value
+" indicating how many lines have been sent to the kernel.
 function! NotebookEvaluate()
 
   if !exists('b:notebook_pid')
-    return
+    echo "No kernel is currently running."
+    return 0
   endif
 
   let l:currentline = line(".")
   if synIDattr(synID(l:currentline,1,1),"name") != "markdownCodeBlock"
-    return
+    echo "Current line is not of type 'markdownCodeBlock'"
+    return 0
   endif
 
   let l:save_cursor = getpos(".")
+  let l:time0 = localtime()
 
   let l:blockstart = l:currentline
   while (synIDattr(synID(l:blockstart,1,1),"name") == "markdownCodeBlock")
@@ -152,15 +159,27 @@ function! NotebookEvaluate()
   endif
   redraw
 
+  let l:mytime = localtime() - l:time0
+  if l:mytime < 1
+    let l:mytime = ""
+  else
+    let l:mytime = " Time=" . mytime . " sec."
+  endif
+
   if l:blockstart == l:blockend
-    echo "Line ".l:blockstart." was sent to the kernel (1 line)"
+    echo "Line ".l:blockstart." was sent to the kernel (1 line)." . l:mytime
   else
     echo "Lines ".l:blockstart."-".l:blockend
-      \ . " were sent to the kernel (".(l:blockend-l:blockstart+1)." lines)"
+      \ . " were sent to the kernel (".(l:blockend-l:blockstart+1)." lines)."
+      \ . l:mytime
   endif
+  
+  return l:blockend - l:blockstart + 1
+
 endfunction
 
 
+" Start a new kernel
 function! NotebookStart()
 
   if exists('b:notebook_pid')
@@ -213,19 +232,12 @@ function! NotebookStart()
 endfunction
 
 
-function! NotebookForceSignal()
-
-  if !exists('b:notebook_pid')
-    return
-  endif
-
-  let l:tmp = system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
-endfunction
-
-
+" Stop the kernel when communication is lost (by using ps + grep for
+" finding the PID of the 'tail' process and killing it)
 function! NotebookEmergencyStop()
 
   if !exists('b:notebook_pid')
+    echo "No kernel is currently running."
     return
   endif
 
@@ -243,13 +255,74 @@ function! NotebookEmergencyStop()
 
 endfunction
 
+
+" Restart the kernel when communication with the kernel is lost
 function! NotebookEmergencyRestart()
 
   if !exists('b:notebook_pid')
+    echo "No kernel is currently running."
     return
   endif
 
   call NotebookEmergencyStop()
   call NotebookStart()
+
+endfunction
+
+
+" Evaluate the whole document
+function! NotebookEvaluateAll()
+
+  if !exists('b:notebook_pid')
+    echo "No kernel is currently running."
+    return
+  endif
+
+  let l:currentline = 0
+  let l:total = 0
+  let l:nbrblocks = 0
+  let l:lastline = line('$')
+  let l:time0 = localtime()
+
+  let l:resetpostmp = g:notebook_resetpos
+  let g:notebook_resetpos = 0
+
+  " Warning : the number of lines is changing during the loop!
+  while l:currentline < l:lastline
+    let l:currentline = l:currentline + 1
+    if (synIDattr(synID(l:currentline,1,1),"name") == "markdownCodeBlock")
+      exe 'silent normal! ' . l:currentline . 'G'
+      let l:nbr = NotebookEvaluate()
+      redraw
+      let l:lastline = line('$')
+      let l:currentline = line('.')
+      let l:total = l:total + l:nbr
+      let l:nbrblocks = l:nbrblocks + 1
+    endif
+  endwhile
+
+  let g:notebook_resetpos = l:resetpostmp
+
+  if l:total == 1
+    let l:count = '(1 line)'
+  else
+    let l:count = '(' . l:total . ' lines)'
+  endif
+
+  let l:mytime = localtime() - l:time0
+  if l:mytime < 1
+    let l:mytime = ""
+  else
+    let l:mytime = " Time=" . mytime . " sec."
+  endif
+
+  if l:nbrblocks == 0
+    echo 'No code block was found in the current document.'
+  elseif l:nbrblocks == 1
+    echo 'One block was sent to the kernel ' . l:count . '.' . l:mytime
+  else
+    echo l:nbrblocks . ' blocks were sent to the kernel ' . l:count . '.'
+     \ . l:mytime
+  endif
 
 endfunction
