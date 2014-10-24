@@ -2,7 +2,7 @@
 "
 " Maintainer:	Thomas Baruchel <baruchel@gmx.com>
 " Last Change:	2014 Oct 24
-" Version:      1.0.3
+" Version:      1.1
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -45,6 +45,9 @@ if !exists('g:notebook_highlight')
 endif
 if !exists('g:notebook_resetpos')
   let g:notebook_resetpos = 0
+endif
+if !exists('g:notebook_shell_internal')
+  let g:notebook_shell_internal = '/bin/sh'
 endif
 
 
@@ -201,6 +204,11 @@ function! NotebookStart()
     return
   endif
 
+  if len(g:notebook_shell_internal) > 0
+    let l:shelltmp = &shell
+    let &shell = g:notebook_shell_internal
+  endif
+
   echon 'Starting the kernel...'
 
   " create two fifo special files
@@ -237,6 +245,10 @@ function! NotebookStart()
   let l:tmp = system('cat ' . l:out . ' > /dev/null')
   echo ' '
   redraw
+
+  if len(g:notebook_shell_internal) > 0
+    let &shell = l:shelltmp
+  endif
 
   " autocmd for stopping the kernel when closing the buffer
   exe 'autocmd BufDelete <buffer> call NotebookClose()'

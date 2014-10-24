@@ -238,3 +238,13 @@ running though not answering, you may want to kill all involved processes with:
 or rather with
 
     :NotebookEmergencyRestart
+
+By default the plugin uses `/bin/sh` as an internal process; it is known to work
+also with `bash`. You may set this with:
+
+  let g:notebook_shell_internal = '/bin/sh'
+  let g:notebook_shell_internal = '/bin/bash'
+  etc.
+
+in your configuration file, but unless you have good reasons to do it, you
+are advised not to change this setting.
