@@ -1,8 +1,8 @@
 " Vim plugin for communicating with some interpreter from a notebook like document
 "
 " Maintainer:	Thomas Baruchel <baruchel@gmx.com>
-" Last Change:	2014 Oct 23
-" Version:      1.0.2
+" Last Change:	2014 Oct 24
+" Version:      1.0.3
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -92,6 +92,20 @@ function! NotebookClose()
   unlet! b:notebook_fifo_out
 
   echo ' '
+
+endfunction
+
+
+function! NotebookRestart()
+
+  if !exists('b:notebook_pid')
+    echo "No kernel is currently running."
+    return
+  endif
+
+  call NotebookClose()
+  redraw
+  call NotebookStart()
 
 endfunction
 
@@ -326,3 +340,13 @@ function! NotebookEvaluateAll()
   endif
 
 endfunction
+
+
+command NotebookStart :call NotebookStart()
+command NotebookEvaluate :call NotebookEvaluate()
+command NotebookEvaluateAll :call NotebookEvaluateAll()
+command NotebookClose :call NotebookClose()
+command NotebookStop :call NotebookClose()
+command NotebookRestart :call NotebookRestart()
+command NotebookEmergencyStop :call NotebookEmergencyStop()
+command NotebookEmergencyRestart :call NotebookEmergencyRestart()

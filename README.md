@@ -10,6 +10,10 @@ will involve a new session of the interpreter at each call, losing variables, et
 With this plugin, a single interpreter is waiting in the background with a persistent
 state between calls.
 
+It follows the philosophy of the Vim editor better than some similar plugins:
+rather than launching an interactive interpreter within a buffer, it keeps it in
+the background and makes it write into the buffer when the user needs it.
+
 Thus, Vim will behave like several well-known "notebook" software:
 
   * iPython Notebook
@@ -25,7 +29,7 @@ A demo can be seen [there](https://www.youtube.com/watch?v=wCGydHdE4b8).
 [![Demo](http://img.youtube.com/vi/wCGydHdE4b8/0.jpg)](https://www.youtube.com/watch?v=wCGydHdE4b8)
 
 The plugin uses Unix background processes, special files, etc. and will only work
-on Unix-like operating systems.
+on Unix-like operating systems; it has been tested under Linux and Mac OS X.
 
 When the kernel is launched, the filetype of the document will be set to "markdown"
 and the standard syntax file for the Markdown type will be used; syntax highlighting
@@ -55,10 +59,10 @@ set them in your ~/.vimrc configuration file.
 
 ### Shortcuts
 
-You should probably map the `NotebookEvaluate()` function to some convenient key.
+You should probably map the the `NotebookEvaluate` command to some convenient key.
 For instance:
 
-    map µ :call NotebookEvaluate()<CR>
+    map µ :NotebookEvaluate<CR>
 
 will map the µ key to the function evaluating code blocks.
 
@@ -72,6 +76,8 @@ By default, the cursor is on the last line of the output after evaluation. If yo
 want rather the cursor staying at the initial location, just set:
 
     let g:notebook_resetpos = 1
+
+The previous setting has no effect when evaluating all the cells at a time.
 
 # Configuring a "kernel"
 
@@ -176,23 +182,32 @@ You have to be careful when copying lines 3 (no-op like) and 5 (with three space
 
 Just start it with:
 
-    :call NotebookStart()
+    :NotebookStart
 
 (or add some shortcut in your configuration file).
 
-Then, a block of code may be evaluated with:
+Then, a block of code (at the position of the cursor) may be evaluated with:
 
-    :call NotebookEvaluate()
+    :NotebookEvaluate
 
 The whole notebook document may be evaluated with:
 
-    :call NotebookEvaluateAll()
+    :NotebookEvaluateAll
+
+The kernel may be stopped with one of the two following commands:
+
+    :NotebookStop
+    :NotebookClose
+
+The kernel may be stopped and restarted with:
+
+    :NotebookRestart
 
 If you encounter some issues, just type `:!ps` and if you see your interpreter still
 running though not answering, you may want to kill all involved processes with:
 
-    :call NotebookEmergencyStop()
+    :NotebookEmergencyStop
 
 or rather with
 
-    :call NotebookEmergencyRestart()
+    :NotebookEmergencyRestart
