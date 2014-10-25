@@ -50,7 +50,7 @@ the Markdown style, though it is not absolutely mandatory.
 Just copy the _notebook.vim_ file in your ~/.vim/plugin directory.
 
 By default, the plugin will use `sh` when launched; you will have to configure it
-to the interpreter you want to use.
+for the interpreter you want to use.
 
 # Basic configuration
 
@@ -79,7 +79,80 @@ want rather the cursor staying at the initial location, just set:
 
 The previous setting has no effect when evaluating all the cells at a time.
 
-# Configuring a "kernel"
+### Configuring a kernel
+
+Many famous interpreters are given below; you will find relevant settings for them.
+However, you may want to configure some settings by yourself; here are the options
+used by the plugin.
+
+The main option is `g:notebook_cmd` which contains the command for starting the
+interpreter. Most of the time it is the name of your interpreter (sometimes you
+may want to add some "quiet" flags for reducing the output). Sometimes, the
+interpreter has to be encapsulated in some other command for solving issues (see
+below).
+
+After each block of code sent to the interpreter, an "invisible" command is sent
+to it for making an arbitrary key being printed; generally some `print` or `echo`
+command will be used for that purpose; that command is in `g:notebook_send`.
+
+Intercommunication between processes can be easely lost as soon as the previous
+key isn't detected properly; with many interpreters, each new command will be
+interpreted even if an error has occured. However an extra command may be
+sent after the block of code and before the request for the key. If `g:notebook_send0`
+is not an empty string, it is sent to the interpreter before the previous command.
+
+In order to let the plugin know that the evaluation of the block is finished, it
+has to detect the arbitrary key printed by the interpreter. The `g:notebook_detect` option must contain the _exact_ line written by the interpreter. Some
+interpreters add spaces before or after the printed key and they have to be included; such spaces may be difficult to detect when trying to configure the plugin, and it is suggested to study the behaviour of your interpreter in a `script` session (editing the _typescript_ file after that will allow to see if spaces
+have been added anywhere).
+
+The plugin is intended to handle the interpreter in the cleanest way; a command
+has to be provided for closing it properly; it is set in `g:notebook_stop`.
+
+# Using the Notebook plugin
+
+Just start it with:
+
+    :NotebookStart
+
+(or add some shortcut in your configuration file).
+
+Then, a block of code (at the position of the cursor) may be evaluated with:
+
+    :NotebookEvaluate
+
+The whole notebook document may be evaluated with:
+
+    :NotebookEvaluateAll
+
+The kernel may be stopped with one of the two following commands:
+
+    :NotebookStop
+    :NotebookClose
+
+The kernel may be stopped and restarted with:
+
+    :NotebookRestart
+
+If you encounter some issues, just type `:!ps` and if you see your interpreter still
+running though not answering, you may want to kill all involved processes with:
+
+    :NotebookEmergencyStop
+
+or rather with
+
+    :NotebookEmergencyRestart
+
+By default the plugin uses `/bin/sh` as an internal process; it is known to work
+also with `bash`. You may set this with:
+
+  let g:notebook_shell_internal = '/bin/sh'
+  let g:notebook_shell_internal = '/bin/bash'
+  etc.
+
+in your configuration file; it looks like some interpreters work better with `bash` and you should try it if you encounter some issues.
+
+# Configurations for several interpreters
 
 Not all interpreters will work with the plugin, but it is intended to allow many
 ways of hacking and you should be able to use many different programs anyway.
@@ -87,7 +160,7 @@ Have a look at different settings in order to understand them.
 
 The interpreter should not use any buffering when writing to the standard output.
 If it is the case, it should still be possible to use the interpreter with the
-help of the `stdbuf` command (see the example for Maxima below).
+help of the `stdbuf` command (see below).
 
 #### Configuring the sh kernel
 
@@ -122,7 +195,7 @@ The settings are similar to the previous ones.
 
     let g:notebook_cmd='dc 2>&1'
     let g:notebook_stop='q'
-    let g:notebook_send='[][VIMDCNOTEBOOK]npn'
+    let g:notebook_send='[][VIMDCNOTEBOOK][]pnnpn'
     let g:notebook_detect='VIMDCNOTEBOOK'
     let g:notebook_send0=''
 
@@ -137,6 +210,9 @@ Ocatve should work with no problem with following settings:
     let g:notebook_send='printf \"VIMOCTAVENOTEBOOK\n\"'
     let g:notebook_detect='VIMOCTAVENOTEBOOK'
     let g:notebook_send0=""
+    let g:notebook_shell_internal = '/bin/bash'
+
+It looks like the shell `sh` does not work here.
 
 #### Configuring Maxima
 
@@ -215,46 +291,20 @@ The three-spaces prompt may be an issue. A quick fix can be:
 
 You have to be careful when copying lines 3 (no-op like) and 5 (with three spaces).
 
-# Using the Notebook plugin
+# Some tricks
 
-Just start it with:
+Two things may complicate the configuration: buffering and detection of a terminal.
 
-    :NotebookStart
+If the interpreter uses buffering when printing to its output stream, the plugin
+will not be able to detect the key at the end of the evaluation. In some cases
+you can easely fix it by using `stdbuf`. For instance with Maxima:
 
-(or add some shortcut in your configuration file).
+    let g:notebook_cmd='stdbuf -i0 -o0 -e0 /usr/bin/maxima'
+       \ . ' --disable-readline --very-quiet'
 
-Then, a block of code (at the position of the cursor) may be evaluated with:
+Another issue can result when the interpreter has two different behaviours, one
+when connected to a terminal (interactive use) or to a pipe (batch use). Whta you
+want is probably the interactive use; this can be solved with `script`. For instance
+you can start `bc` with
 
-    :NotebookEvaluate
-
-The whole notebook document may be evaluated with:
-
-    :NotebookEvaluateAll
-
-The kernel may be stopped with one of the two following commands:
-
-    :NotebookStop
-    :NotebookClose
-
-The kernel may be stopped and restarted with:
-
-    :NotebookRestart
-
-If you encounter some issues, just type `:!ps` and if you see your interpreter still
-running though not answering, you may want to kill all involved processes with:
-
-    :NotebookEmergencyStop
-
-or rather with
-
-    :NotebookEmergencyRestart
-
-By default the plugin uses `/bin/sh` as an internal process; it is known to work
-also with `bash`. You may set this with:
-
-  let g:notebook_shell_internal = '/bin/sh'
-  let g:notebook_shell_internal = '/bin/bash'
-  etc.
-
-in your configuration file, but unless you have good reasons to do it, you
-are advised not to change this setting.
+    let g:notebook_cmd='{ script -c bc /dev/null; }'
