@@ -91,6 +91,9 @@ may want to add some "quiet" flags for reducing the output). Sometimes, the
 interpreter has to be encapsulated in some other command for solving issues (see
 below).
 
+The `g:notebook_sendinit` option allows to send some initialization command; for
+instance it should be used for disabling prompts, removing any escape sequences, etc.
+
 After each block of code sent to the interpreter, an "invisible" command is sent
 to it for making an arbitrary key being printed; generally some `print` or `echo`
 command will be used for that purpose; that command is in `g:notebook_send`.
@@ -146,9 +149,9 @@ or rather with
 By default the plugin uses `/bin/sh` as an internal process; it is known to work
 also with `bash`. You may set this with:
 
-  let g:notebook_shell_internal = '/bin/sh'
-  let g:notebook_shell_internal = '/bin/bash'
-  etc.
+    let g:notebook_shell_internal = '/bin/sh'
+    let g:notebook_shell_internal = '/bin/bash'
+    etc.
 
 in your configuration file; it looks like some interpreters work better with `bash` and you should try it if you encounter some issues.
 
@@ -267,7 +270,34 @@ out-of-date version of Pari-GP; the settings should be something like:
     let g:notebook_stop='quit()'
     let g:notebook_send='print(\"VIMPARIGPNOTEBOOK\");'
     let g:notebook_detect='VIMPARIGPNOTEBOOK'
-    let g:notebook_send0='default(\"readline\",0); default(\"colors\",0);'
+    let g:notebook_send0=''
+    let g:notebook_sendinit='default(\"readline\",0); default(\"colors\",0);'
+
+#### Configuring Scilab
+
+Settings for Scilab will be refined later; right now, I noticed that I could
+start Scilab by installing the scilab-cli-bin client and by launching it in
+a pseudo-terminal with script:
+
+    let g:notebook_cmd = '{ script -c scilab-cli-bin /dev/null; }'
+    let g:notebook_stop = "quit"
+    let g:notebook_send0=""
+    let g:notebook_send = 'disp(\"VIMSCILABNOTEBOOK\")'
+    let g:notebook_detect = ' VIMSCILABNOTEBOOK   '
+
+Cleaning the output will explained later.
+
+#### Configuring Mathematica
+
+It is possible to use the Wolfram engine with the plugin. It has to be launched
+in a pseudo-terminal with `script`. Right now, the output contains many escape
+sequences; how to clean it will be explained later.
+
+    let g:notebook_cmd='{ script -c wolfram /dev/null; }'
+    let g:notebook_stop="Quit"
+    let g:notebook_send0=""
+    let g:notebook_send='Print []; Print [ \"VIMWOLFRAMNOTEBOOK\" ]; Print []'
+    let g:notebook_detect='VIMWOLFRAMNOTEBOOK'
 
 #### Configuring GNU APL
 

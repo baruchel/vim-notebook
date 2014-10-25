@@ -1,8 +1,8 @@
 " Vim plugin for communicating with some interpreter from a notebook like document
 "
 " Maintainer:	Thomas Baruchel <baruchel@gmx.com>
-" Last Change:	2014 Oct 24
-" Version:      1.1
+" Last Change:	2014 Oct 25
+" Version:      1.1.1
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -30,6 +30,9 @@ if !exists('g:notebook_cmd')
 endif
 if !exists('g:notebook_stop')
   let g:notebook_stop = 'exit'
+endif
+if !exists('g:notebook_sendinit')
+  let g:notebook_sendinit = ''
 endif
 if !exists('g:notebook_send0')
   let g:notebook_send0 = ''
@@ -68,6 +71,8 @@ function! NotebookClose()
   echon 'Stopping the kernel...'
 
   exe 'autocmd! * <buffer>'
+
+  " The notebook_send0 has not to be sent here.
 
   " close the process
   let l:tmp = system('echo "' . b:notebook_stop . '" >> ' . b:notebook_fifo_in)
@@ -233,9 +238,13 @@ function! NotebookStart()
   let l:tmp = l:tmp . ' echo "$!"'
   "let l:tmp = l:tmp . ' > ' . b:notebook_fifo_in
   let b:notebook_pid = system(l:tmp)
+
   " send an initial command to be detected
-  if len(b:notebook_send0) > 0
-    let l:tmp = system('echo "' . b:notebook_send0 . '" >> ' . b:notebook_fifo_in)
+  " --------------------------------------
+  " Since version 1.1.1 sending an initial notebook_send0 is disabled;
+  " it is replaced with sending a notebook_sendinit command
+  if len(g:notebook_sendinit) > 0
+    let l:tmp = system('echo "' . g:notebook_sendinit . '" >> ' . b:notebook_fifo_in)
   endif
   let l:tmp = system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
 
@@ -354,11 +363,11 @@ function! NotebookEvaluateAll()
 endfunction
 
 
-command NotebookStart :call NotebookStart()
-command NotebookEvaluate :call NotebookEvaluate()
-command NotebookEvaluateAll :call NotebookEvaluateAll()
-command NotebookClose :call NotebookClose()
-command NotebookStop :call NotebookClose()
-command NotebookRestart :call NotebookRestart()
-command NotebookEmergencyStop :call NotebookEmergencyStop()
-command NotebookEmergencyRestart :call NotebookEmergencyRestart()
+command! NotebookStart :call NotebookStart()
+command! NotebookEvaluate :call NotebookEvaluate()
+command! NotebookEvaluateAll :call NotebookEvaluateAll()
+command! NotebookClose :call NotebookClose()
+command! NotebookStop :call NotebookClose()
+command! NotebookRestart :call NotebookRestart()
+command! NotebookEmergencyStop :call NotebookEmergencyStop()
+command! NotebookEmergencyRestart :call NotebookEmergencyRestart()
