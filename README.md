@@ -271,7 +271,7 @@ out-of-date version of Pari-GP; the settings should be something like:
     let g:notebook_send='print(\"VIMPARIGPNOTEBOOK\");'
     let g:notebook_detect='VIMPARIGPNOTEBOOK'
     let g:notebook_send0=''
-    let g:notebook_sendinit='default(\"readline\",0); default(\"colors\",0);'
+    let g:notebook_sendinit='default(\"readline\",0); default(\"colors\",\"no\");'
 
 #### Configuring Scilab
 
