@@ -1,8 +1,8 @@
 " Vim plugin for communicating with some interpreter from a notebook like document
 "
 " Maintainer:	Thomas Baruchel <baruchel@gmx.com>
-" Last Change:	2014 Oct 25
-" Version:      1.1.1
+" Last Change:	2014 Oct 26
+" Version:      1.1.2
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -75,13 +75,13 @@ function! NotebookClose()
   " The notebook_send0 has not to be sent here.
 
   " close the process
-  let l:tmp = system('echo "' . b:notebook_stop . '" >> ' . b:notebook_fifo_in)
+  call system('echo "' . b:notebook_stop . '" >> ' . b:notebook_fifo_in)
 
   " an empty line should close the 'tail -f' process
-  let l:tmp = system('echo "" >> ' . b:notebook_fifo_in)
+  call system('echo "" >> ' . b:notebook_fifo_in)
 
   " kill the shell process
-  let l:tmp = system('kill -9 ' . b:notebook_pid)
+  call system('kill -9 ' . b:notebook_pid)
 
   " remove some variables
   unlet! b:notebook_stop
@@ -99,7 +99,8 @@ function! NotebookClose()
   "let l:tmp = system('rm -f ' . b:notebook_fifo_out)
   unlet! b:notebook_fifo_out
 
-  echo ' '
+  redraw
+  echo
 
 endfunction
 
@@ -166,9 +167,9 @@ function! NotebookEvaluate()
 
   exe l:blockstart . ',' . l:blockend . 'write! >> ' . b:notebook_fifo_in
   if len(b:notebook_send0) > 0
-    let l:tmp = system('echo "' . b:notebook_send0 . '" >> ' . b:notebook_fifo_in)
+    call system('echo "' . b:notebook_send0 . '" >> ' . b:notebook_fifo_in)
   endif
-  let l:tmp = system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
+  call system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
 
   exe 'silent normal! ' . l:blockend . 'Go'
   exe 'read! cat ' . b:notebook_fifo_out
@@ -214,14 +215,14 @@ function! NotebookStart()
     let &shell = g:notebook_shell_internal
   endif
 
-  echon 'Starting the kernel...'
+  echo 'Starting the kernel...'
 
   " create two fifo special files
   let b:notebook_fifo_in = tempname()
-  let l:tmp = system('mkfifo ' . b:notebook_fifo_in)
+  call system('mkfifo ' . b:notebook_fifo_in)
   let b:notebook_fifo_out = tempname()
   let l:out = b:notebook_fifo_out
-  let l:tmp = system('mkfifo ' . b:notebook_fifo_out)
+  call system('mkfifo ' . b:notebook_fifo_out)
 
   " copy the global variables to buffer variables
   " in order to allow the global variables to be changed
@@ -244,15 +245,14 @@ function! NotebookStart()
   " Since version 1.1.1 sending an initial notebook_send0 is disabled;
   " it is replaced with sending a notebook_sendinit command
   if len(g:notebook_sendinit) > 0
-    let l:tmp = system('echo "' . g:notebook_sendinit . '" >> ' . b:notebook_fifo_in)
+    call system('echo "' . g:notebook_sendinit . '" >> ' . b:notebook_fifo_in)
   endif
-  let l:tmp = system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
+  call system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
 
   set filetype=markdown
   syntax on
 
-  let l:tmp = system('cat ' . l:out . ' > /dev/null')
-  echo ' '
+  call system('cat ' . l:out . ' > /dev/null')
   redraw
 
   if len(g:notebook_shell_internal) > 0
@@ -279,8 +279,14 @@ function! NotebookEmergencyStop()
   let l:cmd = 'ps a | grep -F "tail -f ' . b:notebook_fifo_in . '"'
     \ . ' | awk "!/grep/ {print \$1}"'
   let l:tmp = system(l:cmd)
-  echo "Killing processes with PID " . l:tmp
-  let l:tmp = system("kill -9 " . l:tmp)
+
+  if l:tmp > 0
+    echo "Killing processes with PID " . l:tmp
+    call system("kill -9 " . l:tmp)
+  else
+    echo "Process to be killed could not be found."
+  endif
+
   exe 'autocmd! * <buffer>'
   unlet! b:notebook_stop
   unlet! b:notebook_send

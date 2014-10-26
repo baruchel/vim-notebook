@@ -146,6 +146,10 @@ or rather with
 
     :NotebookEmergencyRestart
 
+which should still close the process in a clean way by killing the process
+feeding the standard input of the interpreter rather than by killing the
+interpreter directly.
+
 By default the plugin uses `/bin/sh` as an internal process; it is known to work
 also with `bash`. You may set this with:
 
