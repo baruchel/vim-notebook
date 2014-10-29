@@ -325,6 +325,17 @@ The three-spaces prompt may be an issue. A quick fix can be:
 
 You have to be careful when copying lines 3 (no-op like) and 5 (with three spaces).
 
+#### Configuring the R interpreter
+
+The interpreter for the R programming language seems to work well with the
+following settings (but deeper tests have to be done):
+
+    let g:notebook_cmd='r --vanilla --no-readline --slave'
+    let g:notebook_stop='q()'
+    let g:notebook_send0=""
+    let g:notebook_send='cat(\"VIMRNOTEBOOK\n\")'
+    let g:notebook_detect="VIMRNOTEBOOK"
+
 # Some tricks
 
 Two things may complicate the configuration: buffering and detection of a terminal.
