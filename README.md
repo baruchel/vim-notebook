@@ -327,10 +327,10 @@ You have to be careful when copying lines 3 (no-op like) and 5 (with three space
 
 #### Configuring the R interpreter
 
-The interpreter for the R programming language seems to work well with the
-following settings (but deeper tests have to be done):
+The interpreter for the R programming language works very well with the
+following settings:
 
-    let g:notebook_cmd='r --vanilla --no-readline --slave'
+    let g:notebook_cmd='R --vanilla --no-readline --slave'
     let g:notebook_stop='q()'
     let g:notebook_send0=""
     let g:notebook_send='cat(\"VIMRNOTEBOOK\n\")'
