@@ -279,17 +279,16 @@ out-of-date version of Pari-GP; the settings should be something like:
 
 #### Configuring Scilab
 
-Settings for Scilab will be refined later; right now, I noticed that I could
-start Scilab by installing the scilab-cli-bin client and by launching it in
-a pseudo-terminal with script:
+The `scilab-cli-bin` client has to be installed; then usable settings are:
 
-    let g:notebook_cmd = '{ script -c scilab-cli-bin /dev/null; }'
+    let g:notebook_cmd = '{ script -qfc scilab-cli-bin /dev/null; }'
+        \ . ' | grep --line-buffered -Pv "\x0d$"'
     let g:notebook_stop = "quit"
     let g:notebook_send0=""
     let g:notebook_send = 'disp(\"VIMSCILABNOTEBOOK\")'
     let g:notebook_detect = ' VIMSCILABNOTEBOOK   '
 
-Cleaning the output will explained later.
+Output is not absolutely perfect however.
 
 #### Configuring Mathematica
 
@@ -320,8 +319,8 @@ make its interpreter compatible with the plugin. First check you have the last v
 NGN APL. Of course, you must install `nodejs` in order to make it work. The following settings
 work very well:
 
-    let g:notebook_cmd = '{ script -qfc "nodejs ~/Téléchargements/apl.js" /dev/null; }'
-      \ . '| grep --line-buffered -Pv "\x0d$"'
+    let g:notebook_cmd = '{ script -qfc "nodejs ~/Downloads/apl.js" /dev/null; }'
+      \ . ' | grep --line-buffered -Pv "\x0d$"'
     let g:notebook_stop = "⎕off"
     let g:notebook_send0=""
     let g:notebook_send = "'VIMNGNAPLNOTEBOOK'"
