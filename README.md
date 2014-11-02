@@ -24,9 +24,9 @@ Thus, Vim will behave like several well-known "notebook" software:
 It has been tested with several interpreters and seems to work well with _Octave_,
 _Maxima_, _GNU APL_, _J_, etc. as well as with some standard tools like `bc` or `sh`.
 
-A demo can be seen [there](https://www.youtube.com/watch?v=wCGydHdE4b8).
+A demo can be seen [there](https://www.youtube.com/watch?v=vHiCpRQiJuU).
 
-[![Demo](http://img.youtube.com/vi/wCGydHdE4b8/0.jpg)](https://www.youtube.com/watch?v=wCGydHdE4b8)
+[![Demo](http://img.youtube.com/vi/vHiCpRQiJuU/0.jpg)](https://www.youtube.com/watch?v=vHiCpRQiJuU)
 
 The plugin uses Unix background processes, special files, etc. and will only work
 on Unix-like operating systems; it has been tested under Linux and Mac OS X.
@@ -366,3 +366,10 @@ want is probably the interactive use; this can be solved with `script`. For inst
 you can start `bc` with
 
     let g:notebook_cmd='{ script -c bc /dev/null; }'
+
+
+# Other videos
+
+An older demo can be seen [there](https://www.youtube.com/watch?v=wCGydHdE4b8).
+
+[![Demo](http://img.youtube.com/vi/wCGydHdE4b8/0.jpg)](https://www.youtube.com/watch?v=wCGydHdE4b8)
