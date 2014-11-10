@@ -315,12 +315,12 @@ GNU APL works very well with the following settings:
 #### Configuring NGN APL
 
 Nick Nickolov, the author of NGN APL, was kind enough to add the `⎕off` command in order to
-make its interpreter compatible with the plugin. First check you have the last version of
+make its interpreter compatible with the plugin. Later he also made his interpreter
+easier to embed in _vim-notebook_. First check you have the last version of
 NGN APL. Of course, you must install `nodejs` in order to make it work. The following settings
 work very well:
 
-    let g:notebook_cmd = '{ script -qfc "nodejs ~/Downloads/apl.js" /dev/null; }'
-      \ . ' | grep --line-buffered -Pv "\x0d$"'
+    let g:notebook_cmd = 'nodejs ~/APL/apl.js --linewise'
     let g:notebook_stop = "⎕off"
     let g:notebook_send0=""
     let g:notebook_send = "'VIMNGNAPLNOTEBOOK'"
@@ -367,6 +367,22 @@ you can start `bc` with
 
     let g:notebook_cmd='{ script -c bc /dev/null; }'
 
+Older versions of NGN APL were needing the following syntax; I leave it here in
+order to help integrating new interpreters:
+
+    let g:notebook_cmd = '{ script -qfc "nodejs ~/Downloads/apl.js" /dev/null; }'
+      \ . ' | grep --line-buffered -Pv "\x0d$"'
+
+# Adding a menu
+
+In the main video, interpreters are launched from a menu. This menu is not a part of
+the plugin; however I add my personal `mynotebook.vim` plugin containing my own
+settings; you may hack it according to your own needs. This second plugin basically
+adds a menu configuring _vim-notebook_ for each interpreter.
+
+In my own `.vimrc` I mapped the menu to the `~` key:
+
+    map ² :emenu Notebook.<C-Z>
 
 # Other videos
 
