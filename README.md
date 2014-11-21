@@ -349,6 +349,18 @@ following settings:
     let g:notebook_send='cat(\"VIMRNOTEBOOK\n\")'
     let g:notebook_detect="VIMRNOTEBOOK"
 
+#### Configuring the kdb+ interpreter (from Kx Systems)
+
+I don't use this interpreter myself, but sinc eI am interested in APL variants, I downloaded the free version and saw if I could make it work. It seems to work very well with the following settings:
+
+    let g:notebook_cmd='/home/thomas/q/l32/q'
+    let g:notebook_stop='\\\\'
+    let g:notebook_send0=""
+    let g:notebook_send='\"VIMQNOTEBOOK\"'
+    let g:notebook_detect='\"VIMQNOTEBOOK\"'
+
+Of course, you will have to change the path of your executable command.
+
 # Some tricks
 
 Two things may complicate the configuration: buffering and detection of a terminal.
