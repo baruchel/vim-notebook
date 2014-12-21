@@ -372,6 +372,17 @@ I don't use FriCAS much, but I think the following settings should work fine:
     let g:notebook_send='output \"\"; output \"VIMFRICASNOTEBOOK\"'
     let g:notebook_detect='   VIMFRICASNOTEBOOK'
 
+#### Configurint the OpenAxiom interpreter
+
+I don't use OpenAxiom much, but I think the following settings should work fine:
+
+    let g:notebook_cmd='{ script -qfc "open-axiom -nogr -noht -nox -noclef" /dev/null; }'
+      \ . '| grep --line-buffered -Pv "\x0d$"'
+    let g:notebook_stop=')quit'
+    let g:notebook_send0=""
+    let g:notebook_send='output \"\"; output \"VIMOPENAXIOMNOTEBOOK\"'
+    let g:notebook_detect='   VIMOPENAXIOMNOTEBOOK'
+
 # Some tricks
 
 Two things may complicate the configuration: buffering and detection of a terminal.
