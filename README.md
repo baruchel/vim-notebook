@@ -361,6 +361,17 @@ I don't use this interpreter myself, but sinc eI am interested in APL variants, 
 
 Of course, you will have to change the path of your executable command.
 
+#### Configuring the FriCAS interpreter
+
+I don't use FriCAS much, but I think the following settings should work fine:
+
+    let g:notebook_cmd='{ script -qfc "fricas -nogr -noht -nox -noclef" /dev/null; }'
+      \ . '| grep --line-buffered -Pv "\x0d$"'
+    let g:notebook_stop=')quit'
+    let g:notebook_send0=""
+    let g:notebook_send='output \"\"; output \"VIMFRICASNOTEBOOK\"'
+    let g:notebook_detect='   VIMFRICASNOTEBOOK'
+
 # Some tricks
 
 Two things may complicate the configuration: buffering and detection of a terminal.
