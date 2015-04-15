@@ -277,6 +277,16 @@ out-of-date version of Pari-GP; the settings should be something like:
     let g:notebook_send0=''
     let g:notebook_sendinit='default(\"readline\",0); default(\"colors\",\"no\");'
 
+#### Configuring Julia
+
+The `julia` interpreter seems to work very well with the plugin:
+
+    let g:notebook_cmd='julia'
+    let g:notebook_stop='exit()'
+    let g:notebook_send0=''
+    let g:notebook_send='println(\"VIMJULIANOTEBOOK\")'
+    let g:notebook_detect='VIMJULIANOTEBOOK'
+
 #### Configuring Scilab
 
 The `scilab-cli-bin` client has to be installed; then usable settings are:
