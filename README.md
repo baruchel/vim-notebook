@@ -335,6 +335,16 @@ work very well:
     let g:notebook_send0=""
     let g:notebook_send = "'VIMNGNAPLNOTEBOOK'"
     let g:notebook_detect = 'VIMNGNAPLNOTEBOOK'
+#### Configuring GNU APL
+
+Dyalog APL works very well with the following settings (tested on a Raspberry Pi):
+
+    let g:notebook_cmd = 'dyalog'
+    let g:notebook_stop = ")off"
+    let g:notebook_send0=""
+    let g:notebook_send = "'VIMDYALOGAPLNOTEBOOK'"
+    let g:notebook_detect = 'VIMDYALOGAPLNOTEBOOK'
+    let g:notebook_shell_internal = '/bin/sh'
 
 #### Configuring the J interpreter
 
