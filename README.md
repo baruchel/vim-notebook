@@ -14,6 +14,9 @@ It follows the philosophy of the Vim editor better than some similar plugins:
 rather than launching an interactive interpreter within a buffer, it keeps it in
 the background and makes it write into the buffer when the user needs it.
 
+Since version 1.2.0 the plugin is compatible with the [vim-markdown](https://github.com/tpope/vim-markdown) plugin (by Tim Pope). Fenced code blocks are now detected
+and correctly handled.
+
 Thus, Vim will behave like several well-known "notebook" software:
 
   * iPython Notebook
@@ -21,8 +24,9 @@ Thus, Vim will behave like several well-known "notebook" software:
   * Mathematica
   * etc.
 
-It has been tested with several interpreters and seems to work well with _Octave_,
-_Maxima_, _GNU APL_, _J_, etc. as well as with some standard tools like `bc` or `sh`.
+It has been tested with several interpreters and seems to work well with _Julia_,
+_Octave_, _Maxima_, _GNU APL_, _J_, etc. as well as with some standard tools
+like `bc` or `sh`.
 
 A demo can be seen [there](https://www.youtube.com/watch?v=vHiCpRQiJuU).
 
@@ -137,19 +141,6 @@ The kernel may be stopped and restarted with:
 
     :NotebookRestart
 
-If you encounter some issues, just type `:!ps` and if you see your interpreter still
-running though not answering, you may want to kill all involved processes with:
-
-    :NotebookEmergencyStop
-
-or rather with
-
-    :NotebookEmergencyRestart
-
-which should still close the process in a clean way by killing the process
-feeding the standard input of the interpreter rather than by killing the
-interpreter directly.
-
 By default the plugin uses `/bin/sh` as an internal process; it is known to work
 also with `bash`. You may set this with:
 
@@ -207,6 +198,14 @@ The settings are similar to the previous ones.
     let g:notebook_send0=''
 
 The settings are similar to the previous ones.
+
+#### Configuring Julia
+
+    let g:notebook_cmd='~/contribs/julia/julia -qi'
+    let g:notebook_stop='exit()'
+    let g:notebook_send0=""
+    let g:notebook_send='println(); println(\"VIMJULIANOTEBOOK\")'
+    let g:notebook_detect='VIMJULIANOTEBOOK'
 
 #### Configuring Octave
 
@@ -392,7 +391,7 @@ I don't use FriCAS much, but I think the following settings should work fine:
     let g:notebook_send='output \"\"; output \"VIMFRICASNOTEBOOK\"'
     let g:notebook_detect='   VIMFRICASNOTEBOOK'
 
-#### Configurint the OpenAxiom interpreter
+#### Configuring the OpenAxiom interpreter
 
 I don't use OpenAxiom much, but I think the following settings should work fine:
 

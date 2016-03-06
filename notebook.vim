@@ -1,8 +1,8 @@
 " Vim plugin for communicating with some interpreter from a notebook like document
 "
-" Maintainer:	Thomas Baruchel <baruchel@gmx.com>
-" Last Change:	2014 Oct 26
-" Version:      1.1.2
+" Maintainer:   Thomas Baruchel <baruchel@gmx.com>
+" Last Change:  2016 Mar 06
+" Version:      1.2.0
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -88,6 +88,14 @@ function! NotebookClose()
   unlet! b:notebook_send
   unlet! b:notebook_pid
 
+  " Force killing the 'tail' process
+  let l:cmd = 'ps a | grep -F "tail -f ' . b:notebook_fifo_in . '"'
+    \ . ' | awk "!/grep/ {print \$1}"'
+  let l:tmp = system(l:cmd)
+  if l:tmp > 0
+    call system("kill -9 " . l:tmp)
+  endif
+
   " I have to think if it is really useful to delete the two FIFOs
   " (because a race condition could occur if they are removed
   " before the 'stop' command has actually been read, and it may be
@@ -119,6 +127,28 @@ function! NotebookRestart()
 endfunction
 
 
+" Check whether a given line is part of a Markdown code block
+function! NotebookCheckLine(l)
+  " Case 1
+  if synIDattr(synID(a:l,1,1),"name") == "markdownCodeBlock"
+    return 1
+  endif
+  if synIDattr(synID(a:l,1,1),"name") == "markdownCodeDelimiter"
+    return 1
+  endif
+  let l:s = synstack(a:l,1)
+  if len(l:s) == 0
+    return 0
+  endif
+  " Case 2
+  if synIDattr(l:s[0],"name")[0:16] == "markdownHighlight"
+    return 1
+  endif
+  " Return False
+  return 0
+endfunction
+
+
 " Evaluate the Code Block at the position of the cursor.
 " Since version 1.0.2 the function NotebookEvaluate() has a return value
 " indicating how many lines have been sent to the kernel.
@@ -130,8 +160,8 @@ function! NotebookEvaluate()
   endif
 
   let l:currentline = line(".")
-  if synIDattr(synID(l:currentline,1,1),"name") != "markdownCodeBlock"
-    echo "Current line is not of type 'markdownCodeBlock'"
+  if NotebookCheckLine(l:currentline) == 0
+    echo "Current line is not a Markdown code block"
     return 0
   endif
 
@@ -139,19 +169,35 @@ function! NotebookEvaluate()
   let l:time0 = localtime()
 
   let l:blockstart = l:currentline
-  while (synIDattr(synID(l:blockstart,1,1),"name") == "markdownCodeBlock")
+  while NotebookCheckLine(l:blockstart) == 1
     \ && (l:blockstart >= 1)
     let l:blockstart = l:blockstart - 1
   endwhile
   let l:blockstart = l:blockstart + 1
+  " Fix for fenced code block
+  if synIDattr(synID(l:blockstart,1,1),"name") == "markdownCodeDelimiter"
+    let l:blockstart = l:blockstart + 1
+  endif
 
   let l:blockend = l:currentline
   let l:lastline = line("$")
-  while synIDattr(synID(l:blockend,1,1),"name") == "markdownCodeBlock"
+  while NotebookCheckLine(l:blockend) == 1
     \ && (l:blockend <= l:lastline)
     let l:blockend = l:blockend + 1
   endwhile
   let l:blockend = l:blockend - 1
+  " Location for writing the answer
+  " (not always the same as l:blockend, see below)
+  let l:blockendw = l:blockend
+  " Fix for fenced code block
+  if synIDattr(synID(l:blockend,1,1),"name") == "markdownCodeDelimiter"
+    let l:blockend = l:blockend - 1
+  endif
+
+  if l:blockend < l:blockstart
+    echo "The block of code is empty"
+    return 0
+  end
 
   if g:notebook_highlight != 0
     let l:tmp_pattern = "match Todo /"
@@ -171,7 +217,7 @@ function! NotebookEvaluate()
   endif
   call system('echo "' . b:notebook_send . '" >> ' . b:notebook_fifo_in)
 
-  exe 'silent normal! ' . l:blockend . 'Go'
+  exe 'silent normal! ' . l:blockendw . 'Go'
   exe 'read! cat ' . b:notebook_fifo_out
   if g:notebook_highlight != 0
     match
@@ -196,7 +242,7 @@ function! NotebookEvaluate()
       \ . " were sent to the kernel (".(l:blockend-l:blockstart+1)." lines)."
       \ . l:mytime
   endif
-  
+ 
   return l:blockend - l:blockstart + 1
 
 endfunction
@@ -267,50 +313,6 @@ function! NotebookStart()
 endfunction
 
 
-" Stop the kernel when communication is lost (by using ps + grep for
-" finding the PID of the 'tail' process and killing it)
-function! NotebookEmergencyStop()
-
-  if !exists('b:notebook_pid')
-    echo "No kernel is currently running."
-    return
-  endif
-
-  let l:cmd = 'ps a | grep -F "tail -f ' . b:notebook_fifo_in . '"'
-    \ . ' | awk "!/grep/ {print \$1}"'
-  let l:tmp = system(l:cmd)
-
-  if l:tmp > 0
-    echo "Killing processes with PID " . l:tmp
-    call system("kill -9 " . l:tmp)
-  else
-    echo "Process to be killed could not be found."
-  endif
-
-  exe 'autocmd! * <buffer>'
-  unlet! b:notebook_stop
-  unlet! b:notebook_send
-  unlet! b:notebook_pid
-  unlet! b:notebook_fifo_in
-  unlet! b:notebook_fifo_out
-
-endfunction
-
-
-" Restart the kernel when communication with the kernel is lost
-function! NotebookEmergencyRestart()
-
-  if !exists('b:notebook_pid')
-    echo "No kernel is currently running."
-    return
-  endif
-
-  call NotebookEmergencyStop()
-  call NotebookStart()
-
-endfunction
-
-
 " Evaluate the whole document
 function! NotebookEvaluateAll()
 
@@ -375,5 +377,3 @@ command! NotebookEvaluateAll :call NotebookEvaluateAll()
 command! NotebookClose :call NotebookClose()
 command! NotebookStop :call NotebookClose()
 command! NotebookRestart :call NotebookRestart()
-command! NotebookEmergencyStop :call NotebookEmergencyStop()
-command! NotebookEmergencyRestart :call NotebookEmergencyRestart()
