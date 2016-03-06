@@ -2,7 +2,7 @@
 "
 " Maintainer:   Thomas Baruchel <baruchel@gmx.com>
 " Last Change:  2016 Mar 06
-" Version:      1.2.1
+" Version:      1.2.2
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -89,7 +89,7 @@ function! NotebookClose()
   unlet! b:notebook_pid
 
   " Force killing the 'tail' process
-  let l:cmd = 'ps a | grep -F "tail -f ' . b:notebook_fifo_in . '"'
+  let l:cmd = 'ps x | grep -F "tail -f ' . b:notebook_fifo_in . '"'
     \ . ' | awk "!/grep/ {print \$1}"'
   let l:tmp = system(l:cmd)
   if l:tmp > 0
