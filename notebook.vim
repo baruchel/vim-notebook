@@ -2,7 +2,7 @@
 "
 " Maintainer:   Thomas Baruchel <baruchel@gmx.com>
 " Last Change:  2016 Mar 06
-" Version:      1.2.0
+" Version:      1.2.1
 
 " Copyright (c) 2014 Thomas Baruchel
 "
@@ -333,7 +333,7 @@ function! NotebookEvaluateAll()
   " Warning : the number of lines is changing during the loop!
   while l:currentline < l:lastline
     let l:currentline = l:currentline + 1
-    if (synIDattr(synID(l:currentline,1,1),"name") == "markdownCodeBlock")
+    if NotebookCheckLine(l:currentline) == 1
       exe 'silent normal! ' . l:currentline . 'G'
       let l:nbr = NotebookEvaluate()
       redraw
