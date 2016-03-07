@@ -28,7 +28,7 @@ It has been tested with several interpreters and seems to work well with _Julia_
 _Octave_, _Maxima_, _GNU APL_, _J_, etc. as well as with some standard tools
 like `bc` or `sh`.
 
-A demo can be seen [there](https://www.youtube.com/watch?v=vHiCpRQiJuU).
+A demo can be seen [there](https://www.youtube.com/watch?v=vHiCpRQiJuU) (another one which is related to the Julia programming language can also be found [there](https://youtu.be/MGIsOgikFuY)).
 
 [![Demo](http://img.youtube.com/vi/vHiCpRQiJuU/0.jpg)](https://www.youtube.com/watch?v=vHiCpRQiJuU)
 
