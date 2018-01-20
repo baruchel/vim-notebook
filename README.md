@@ -334,7 +334,7 @@ work very well:
     let g:notebook_send0=""
     let g:notebook_send = "'VIMNGNAPLNOTEBOOK'"
     let g:notebook_detect = 'VIMNGNAPLNOTEBOOK'
-#### Configuring GNU APL
+#### Configuring Dyalog APL
 
 Dyalog APL works very well with the following settings (tested on a Raspberry Pi):
 
